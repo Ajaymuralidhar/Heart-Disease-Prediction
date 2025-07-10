@@ -1,0 +1,58 @@
+<!-- templates/analyze.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Analyze ECG</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f5f9ff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container mt-5">
+    <div class="card p-5 shadow-lg">
+      <h2 class="text-center text-primary mb-4">🧪 Analyze ECG Report</h2>
+
+      <form action="/analyze" method="POST" enctype="multipart/form-data">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>Patient Name</label>
+            <input type="text" name="name" class="form-control" required>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label>Age</label>
+            <input type="number" name="age" class="form-control" required>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label>Gender</label>
+            <select name="gender" class="form-control">
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label>Symptoms</label>
+          <input type="text" name="symptoms" class="form-control" placeholder="e.g., chest pain, breathlessness" required>
+        </div>
+
+        <div class="mb-3">
+          <label>Upload ECG Image</label>
+          <input type="file" name="image" accept="image/*" class="form-control" required>
+        </div>
+
+        <div class="text-center mt-4">
+          <button class="btn btn-success btn-lg" type="submit">🔍 Analyze</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>
