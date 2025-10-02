@@ -5,8 +5,9 @@ from werkzeug.utils import secure_filename
 from utils.model_loader import load_model, predict
 from faq_bot import get_faq_response
 from utils.gradcam import preprocess_image, generate_gradcam, overlay_heatmap
-from utils.database import init_db, insert_patient, get_all_patients
+from utils.database import init_db, insert_patient, get_all_patients, get_patient_by_id
 from utils.auth import check_login, login_user, is_logged_in, logout_user
+from gemini import analyze_with_gemini   # <-- Gemini integration
 
 # Initialize App
 app = Flask(__name__)
@@ -68,20 +69,14 @@ def analyze():
             cam = generate_gradcam(model, image_tensor, pred_idx)
             gradcam_path = overlay_heatmap(save_path, cam)
 
-            # Save to DB
-            insert_patient(name, age, gender, symptoms, result, gradcam_path)
+            # Gemini AI Explanation
+            gemini_explanation = analyze_with_gemini(gradcam_path, symptoms)
 
-            # Save in session for report and chatbot
-            session['last_analysis'] = {
-                'name': name,
-                'age': age,
-                'gender': gender,
-                'symptoms': symptoms,
-                'result': result,
-                'image_path': save_path,
-                'gradcam_path': gradcam_path,
-                'confidence_scores': confidence_scores
-            }
+            # Save to DB
+            insert_patient(name, age, gender, symptoms, result, gradcam_path, gemini_explanation)
+
+            # Save summary in session (for redirect)
+            session['last_patient_name'] = name  
 
             return redirect('/report')
 
@@ -90,16 +85,46 @@ def analyze():
 
     return render_template('analyze.html')
 
+import json
+
 @app.route('/report')
 def report():
     if not is_logged_in():
         return redirect('/login')
 
-    context = session.get('last_analysis')
-    if not context:
+    # Fetch last inserted patient from DB
+    last_patient_name = session.get('last_patient_name')
+    if not last_patient_name:
         return redirect('/analyze')
 
+    patients = get_all_patients()
+    patient = [p for p in patients if p[1] == last_patient_name][-1]  # latest entry
+
+    # Try parsing Gemini explanation (stored as JSON string in DB)
+    try:
+        gemini_data = json.loads(patient[7]) if patient[7] else {}
+    except:
+        gemini_data = {"observation": patient[7], "risks": [], "meaning": "", "next_steps": []}
+
+    context = {
+        "name": patient[1],
+        "age": patient[2],
+        "gender": patient[3],
+        "symptoms": patient[4],
+        "result": patient[5],
+        "gradcam_path": patient[6],
+        "image_path": "static/uploads/" + os.path.basename(patient[6]).replace("_gradcam",""),
+        "confidence_scores": [],  # could be extended if stored
+
+        # Structured Gemini fields
+        "gemini_observation": gemini_data.get("observation", ""),
+        "gemini_risks": gemini_data.get("risks", []),
+        "gemini_meaning": gemini_data.get("meaning", ""),
+        "gemini_next_steps": gemini_data.get("next_steps", [])
+    }
+
     return render_template("report.html", **context)
+
 
 @app.route('/faq', methods=['GET', 'POST'])
 def faq():
@@ -107,10 +132,9 @@ def faq():
         user_question = request.form['question']
         answer = get_faq_response(user_question)
 
-        context = session.get('last_analysis', {})
-        return render_template('chatbot.html', chatbot_response=answer, **context)
+        return render_template('chatbot.html', chatbot_response=answer)
 
-    return render_template('chatbot.html', **session.get('last_analysis', {}))
+    return render_template('chatbot.html')
 
 @app.route('/history')
 def history():

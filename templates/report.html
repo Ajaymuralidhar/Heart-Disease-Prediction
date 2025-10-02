@@ -22,70 +22,70 @@
 <body>
 
   <div class="container mt-5">
-    <div class="card mt-2 p-4 shadow-lg border border-primary">
-      <h3 class="text-center text-primary mb-4">📋 ECG Diagnosis Report</h3>
+  <div class="card mt-2 p-4 shadow-lg border border-primary">
+    <h3 class="text-center text-primary mb-4">📋 ECG Diagnosis Report</h3>
 
-      <div class="row mb-4">
-        <div class="col-md-6">
-          <h5>👤 Patient Information</h5>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item"><strong>Name:</strong> {{ name }}</li>
-            <li class="list-group-item"><strong>Age:</strong> {{ age }}</li>
-            <li class="list-group-item"><strong>Gender:</strong> {{ gender }}</li>
-            <li class="list-group-item"><strong>Symptoms:</strong> {{ symptoms }}</li>
-          </ul>
-        </div>
-        <div class="col-md-6">
-          <h5 class="text-success">🧠 Prediction Result</h5>
-          <p><strong>Disease:</strong> {{ result }}</p>
-          <table class="table table-bordered table-striped mt-2">
-            <thead class="table-light">
-              <tr>
-                <th>Condition</th>
-                <th>Confidence Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for condition, score in confidence_scores %}
-              <tr>
-                <td>{{ condition }}</td>
-                <td>{{ score }}%</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <h5>👤 Patient Information</h5>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><strong>Name:</strong> {{ name }}</li>
+          <li class="list-group-item"><strong>Age:</strong> {{ age }}</li>
+          <li class="list-group-item"><strong>Gender:</strong> {{ gender }}</li>
+          <li class="list-group-item"><strong>Symptoms:</strong> {{ symptoms }}</li>
+        </ul>
       </div>
-
-      <div class="row mt-3">
-        <div class="col-md-6 text-center">
-          <h5>📥 Uploaded ECG Image</h5>
-          <img src="{{ image_path }}" alt="Original ECG" class="ecg-image">
-        </div>
-        <div class="col-md-6 text-center">
-          <h5>🔥 Grad-CAM Heatmap</h5>
-          <img src="{{ gradcam_path }}" alt="Grad-CAM Output" class="gradcam-image">
-        </div>
+      <div class="col-md-6">
+        <h5 class="text-success">🧠 Prediction Result</h5>
+        <p><strong>Disease:</strong> {{ result }}</p>
       </div>
     </div>
-  </div>
 
-  <!-- Chatbot Section -->
-  <div class="container mt-5 mb-5">
-    <div class="card shadow p-4 rounded-4 chatbot-container">
-      <h4 class="text-center text-secondary mb-3">💬 Heart Health FAQ Chatbot</h4>
-      <form action="/faq" method="POST" class="chatbot-form d-flex gap-2">
-        <input type="text" name="question" class="form-control" placeholder="Ask about ECG, MI, or heart health..." required>
-        <button class="btn btn-primary" type="submit">Ask</button>
-      </form>
-
-      {% if chatbot_response %}
-      <div class="alert alert-info mt-3">
-        <strong>AI Response:</strong> {{ chatbot_response }}
+    <div class="row mt-3">
+      <div class="col-md-6 text-center">
+        <h5>📥 Uploaded ECG Image</h5>
+        <img src="{{ image_path }}" alt="Original ECG" class="ecg-image">
       </div>
-      {% endif %}
+      <div class="col-md-6 text-center">
+        <h5>🔥 Grad-CAM Heatmap</h5>
+        <img src="{{ gradcam_path }}" alt="Grad-CAM Output" class="gradcam-image">
+      </div>
     </div>
+
+    <!-- Gemini Explanation -->
+    <div class="mt-4 p-3 border rounded bg-light">
+  <h5 class="text-danger">🩺 AI Medical Explanation</h5>
+
+  <div class="mb-3">
+    <h6 class="fw-bold">1. Observation from the Grad-CAM</h6>
+    <p>{{ gemini_observation }}</p>
   </div>
+
+  <div class="mb-3">
+    <h6 class="fw-bold">2. Possible Heart Risks / Conditions</h6>
+    <ul>
+      {% for risk in gemini_risks %}
+      <li>{{ risk }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="mb-3">
+    <h6 class="fw-bold">3. What This Means for You</h6>
+    <p>{{ gemini_meaning }}</p>
+  </div>
+
+  <div class="mb-3">
+    <h6 class="fw-bold">4. Recommended Next Steps</h6>
+    <ul>
+      {% for step in gemini_next_steps %}
+      <li>{{ step }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+  </div>
+</div>
 
 </body>
 </html>
