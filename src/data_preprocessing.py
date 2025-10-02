@@ -1,8 +1,6 @@
 import os
 import cv2
 from tqdm import tqdm
-from PIL import Image
-import numpy as np
 
 # Configuration
 INPUT_DIR = "data/raw"

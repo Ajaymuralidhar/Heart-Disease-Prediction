@@ -65,4 +65,4 @@ with torch.no_grad():
     _, pred = torch.max(outputs, 1)
     predicted_class = CLASS_NAMES[pred.item()]
 
-print(f"✅ Predicted Class: {predicted_class}")
+print(f" Predicted Class: {predicted_class}")
