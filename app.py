@@ -8,7 +8,7 @@ from utils.gradcam import preprocess_image, generate_gradcam, overlay_heatmap
 from utils.database import init_db, insert_patient, get_all_patients, get_patient_by_id
 from utils.auth import check_login, login_user, is_logged_in, logout_user
 from gemini import analyze_with_gemini   # <-- Gemini integration
-
+import re
 # Initialize App
 app = Flask(__name__)
 app.secret_key = 'Doctor'
@@ -22,17 +22,37 @@ class_names = ['Abnormal', 'Myocardial Infarction', 'Normal', 'Patient MI Histor
 
 @app.route('/')
 def home():
-    return redirect('/login')
+    # Direct users to the new landing page
+    return render_template('home.html')
+
+# ... in app.py ...
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # Use dummy import here for snippet brevity, ensure they are imported globally in app.py
+    from utils.auth import check_login, login_user 
+
     if request.method == 'POST':
-        if check_login(request.form['username'], request.form['password']):
-            login_user(request.form['username'])
+        # POST logic for form submission (Firebase token verification)
+        id_token = request.form.get('id_token')
+        
+        # We need the mode back to show the correct form on error
+        mode = request.form.get('mode', 'login') 
+
+        user_data = check_login(id_token)
+
+        if user_data:
+            login_user(user_data) 
             return redirect('/dashboard')
         else:
-            return render_template('login.html', error="Invalid credentials")
-    return render_template('login.html')
+            error_message = "Authentication failed. Invalid or expired token. Please sign in again."
+            # On error, render login.html with the error message AND the original mode
+            return render_template('login.html', error=error_message, mode=mode), 401
+    
+    # 2. GET Logic: Get the mode from the URL (?mode=login or ?mode=signup)
+    mode = request.args.get('mode', 'login') # Default to 'login'
+    return render_template('login.html', mode=mode)
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -71,9 +91,9 @@ def analyze():
 
             # Gemini AI Explanation
             gemini_explanation = analyze_with_gemini(gradcam_path, symptoms)
-
+            gemini_explanation_json = json.dumps(gemini_explanation)  # Store as JSON string
             # Save to DB
-            insert_patient(name, age, gender, symptoms, result, gradcam_path, gemini_explanation)
+            insert_patient(name, age, gender, symptoms, result, gradcam_path, gemini_explanation_json)
 
             # Save summary in session (for redirect)
             session['last_patient_name'] = name  
@@ -102,10 +122,14 @@ def report():
 
     # Try parsing Gemini explanation (stored as JSON string in DB)
     try:
-        gemini_data = json.loads(patient[7]) if patient[7] else {}
-    except:
+        raw_json = patient[7] or ""
+        match = re.search(r'\{.*\}', raw_json, re.DOTALL)
+        if match:
+            gemini_data = json.loads(match.group(0))
+        else:
+            gemini_data = json.loads(raw_json)
+    except Exception:
         gemini_data = {"observation": patient[7], "risks": [], "meaning": "", "next_steps": []}
-
     context = {
         "name": patient[1],
         "age": patient[2],
