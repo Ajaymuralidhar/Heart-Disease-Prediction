@@ -23,8 +23,9 @@ transform = transforms.Compose([
 ])
 
 # Load Validation Set
+
 val_dataset = datasets.ImageFolder(VAL_DIR, transform=transform)
-val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
+val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
 class_names = val_dataset.classes
 
 # Load Model

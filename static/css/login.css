@@ -1,56 +1,40 @@
 /* static/css/login.css */
+/* Overriding body for login specifically to have a medical tech background */
 body {
-    margin: 0;
-    padding: 0;
-    background: url('/static/images/heart_bg2.jpg') no-repeat center center fixed;
+    background: linear-gradient(rgba(13, 110, 253, 0.8), rgba(0, 0, 0, 0.7)), 
+                url('/static/images/heart_bg2.jpg') no-repeat center center fixed;
     background-size: cover;
-    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
 }
 
 .login-container {
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 30px 40px;
-    max-width: 400px;
-    margin: 100px auto;
-    border-radius: 15px;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-    color: white;
+    width: 100%;
+    max-width: 900px;
+}
+
+.auth-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.auth-card h3 {
+    font-weight: 700;
+    margin-bottom: 30px;
     text-align: center;
+    letter-spacing: -0.5px;
 }
 
-.login-container h2 {
-    margin-bottom: 20px;
-    font-size: 28px;
+.form-floating > label {
+    color: #6c757d;
 }
 
-input[type="text"], input[type="password"] {
-    width: 90%;
-    padding: 12px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-}
-
-button {
-    width: 95%;
-    padding: 12px;
-    background-color: #00c9a7;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    color: white;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background 0.3s ease;
-}
-
-button:hover {
-    background-color: #008e7e;
-}
-
-.error {
-    color: #ff7070;
-    font-size: 14px;
-    margin-bottom: 10px;
+.btn-link {
+    text-decoration: none;
+    font-weight: 600;
 }

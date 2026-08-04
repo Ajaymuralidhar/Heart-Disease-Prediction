@@ -1,54 +1,66 @@
-<!-- templates/analyze.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Analyze ECG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background-color: #f5f9ff;
-    }
-  </style>
+  <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+  
+  <div class="container mt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold"><i class="bi bi-search-heart"></i> New Analysis</h2>
+      <a href="/dashboard" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Dashboard</a>
+    </div>
 
-  <div class="container mt-5">
-    <div class="card p-5 shadow-lg">
-      <h2 class="text-center text-primary mb-4">🧪 Analyze ECG Report</h2>
-
+    <div class="card p-5">
       <form action="/analyze" method="POST" enctype="multipart/form-data">
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label>Patient Name</label>
-            <input type="text" name="name" class="form-control" required>
+        
+        <h5 class="mb-4 text-muted border-bottom pb-2">Patient Demographics</h5>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="text" name="name" id="pName" class="form-control" placeholder="Name" required>
+              <label for="pName">Patient Name</label>
+            </div>
           </div>
-          <div class="col-md-3 mb-3">
-            <label>Age</label>
-            <input type="number" name="age" class="form-control" required>
+          <div class="col-md-3">
+            <div class="form-floating">
+              <input type="number" name="age" id="pAge" class="form-control" placeholder="Age" required>
+              <label for="pAge">Age</label>
+            </div>
           </div>
-          <div class="col-md-3 mb-3">
-            <label>Gender</label>
-            <select name="gender" class="form-control">
-              <option>Male</option>
-              <option>Female</option>
-              <option>Other</option>
-            </select>
+          <div class="col-md-3">
+            <div class="form-floating">
+              <select name="gender" id="pGender" class="form-select">
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+              </select>
+              <label for="pGender">Gender</label>
+            </div>
           </div>
         </div>
 
-        <div class="mb-3">
-          <label>Symptoms</label>
-          <input type="text" name="symptoms" class="form-control" placeholder="e.g., chest pain, breathlessness" required>
+        <h5 class="mt-5 mb-4 text-muted border-bottom pb-2">Clinical Data</h5>
+        <div class="mb-4">
+          <label class="form-label fw-bold">Presenting Symptoms</label>
+          <input type="text" name="symptoms" class="form-control p-3" placeholder="e.g., severe chest pain, shortness of breath, palpitations..." required>
         </div>
 
-        <div class="mb-3">
-          <label>Upload ECG Image</label>
-          <input type="file" name="image" accept="image/*" class="form-control" required>
+        <div class="mb-5">
+          <label class="form-label fw-bold">ECG Image Upload</label>
+          <input type="file" name="image" accept="image/*" class="form-control form-control-lg" required>
+          <div class="form-text">Supported formats: JPG, PNG, JPEG. Ensure image is clear.</div>
         </div>
 
-        <div class="text-center mt-4">
-          <button class="btn btn-success btn-lg" type="submit">🔍 Analyze</button>
+        <div class="text-center">
+          <button class="btn btn-primary btn-lg px-5 py-3 shadow" type="submit">
+            <i class="bi bi-cpu-fill me-2"></i> Run AI Diagnosis
+          </button>
         </div>
       </form>
     </div>
