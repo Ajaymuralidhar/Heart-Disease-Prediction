@@ -1,3 +1,14 @@
+# Ignore environment and credential files
+.env
+heart-disease-91cbd-firebase-adminsdk-fbsvc-1fc6e3f4bf.json
+removed_secrets_backup/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# PyTorch saved models
+*.pth
 # Python bytecode and caches
 __pycache__/
 *.py[cod]
