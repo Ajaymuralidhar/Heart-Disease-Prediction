@@ -3,7 +3,6 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
 
 from utils.model_loader import load_model, predict
-from faq_bot import get_faq_response
 from utils.gradcam import preprocess_image, generate_gradcam, overlay_heatmap
 from utils.database import init_db, insert_patient, get_all_patients, get_patient_by_id
 from utils.auth import check_login, login_user, is_logged_in, logout_user
@@ -80,8 +79,6 @@ def analyze():
             # Prediction
             pred_idx, probs = predict(model, save_path)
             result = class_names[pred_idx]
-            confidence_scores = [(class_names[i], round(probs[i].item(), 2)) for i in range(len(class_names))]
-
             # Grad-CAM
             image_tensor, _ = preprocess_image(save_path)
             if image_tensor.ndim == 3:
@@ -130,6 +127,8 @@ def report():
             gemini_data = json.loads(raw_json)
     except Exception:
         gemini_data = {"observation": patient[7], "risks": [], "meaning": "", "next_steps": []}
+    # For now, recompute using the saved image and model
+
     context = {
         "name": patient[1],
         "age": patient[2],
@@ -138,8 +137,6 @@ def report():
         "result": patient[5],
         "gradcam_path": patient[6],
         "image_path": "static/uploads/" + os.path.basename(patient[6]).replace("_gradcam",""),
-        "confidence_scores": [],  # could be extended if stored
-
         # Structured Gemini fields
         "gemini_observation": gemini_data.get("observation", ""),
         "gemini_risks": gemini_data.get("risks", []),
@@ -148,17 +145,6 @@ def report():
     }
 
     return render_template("report.html", **context)
-
-
-@app.route('/faq', methods=['GET', 'POST'])
-def faq():
-    if request.method == 'POST':
-        user_question = request.form['question']
-        answer = get_faq_response(user_question)
-
-        return render_template('chatbot.html', chatbot_response=answer)
-
-    return render_template('chatbot.html')
 
 @app.route('/history')
 def history():

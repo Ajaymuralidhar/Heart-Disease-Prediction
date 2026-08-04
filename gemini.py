@@ -12,14 +12,14 @@ import google.generativeai as genai
 # Load variables from .env (override any OS-level env vars)
 load_dotenv(override=True)
 
-API_KEY = os.getenv("GOOGLE_API_KEY")
+API_KEY = os.getenv("GEMINI_API_KEY")
 if not API_KEY:
     raise RuntimeError("GOOGLE_API_KEY is not set. Check your .env file.")
 
 genai.configure(api_key=API_KEY)
 
 # Load Gemini model
-model = genai.GenerativeModel("gemini-2.5-pro")
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 
 # ---------------------------------------------------------
@@ -54,15 +54,17 @@ def analyze_with_gemini(gradcam_path: str, symptoms: str) -> dict:
             - Output MUST be ONLY valid JSON (no markdown, no text outside JSON).
             - Do NOT wrap JSON in backticks or code fences.
             - Use the exact keys listed below.
-            - Keep responses concise and clinically relevant.
+            - Provide detailed, accurate responses based on standard ECG interpretation guidelines and the Grad-CAM visualization.
+            - Base your analysis on evidence from the image and symptoms; avoid speculation.
             - If uncertain, clearly express uncertainty instead of hallucinating.
+            - Ensure responses are clinically relevant and comprehensive without being overly verbose.
 
             REQUIRED JSON FORMAT:
             {{
-                "observation": "<brief clinical observation from Grad-CAM>",
-                "risks": ["<potential risk 1>", "<potential risk 2>"],
-                "meaning": "<short explanation of what the findings could indicate>",
-                "next_steps": ["<recommended action 1>", "<recommended action 2>"]
+                "observation": "<detailed clinical observation from Grad-CAM, describing key features and patterns>",
+                "risks": ["<potential risk 1>", "<potential risk 2>", "<additional risks if applicable>"],
+                "meaning": "<detailed explanation of what the findings could indicate, including possible conditions>",
+                "next_steps": ["<recommended action 1>", "<recommended action 2>", "<additional steps if needed>"]
             }}
 
             Patient symptoms: {symptoms}
